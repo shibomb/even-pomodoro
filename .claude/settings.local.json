@@ -5,7 +5,9 @@
       "Bash(npm install:*)",
       "Bash(grep -r createScreenMapper /Users/shibomb/Documents/projects/even-dev/even-workout/node_modules/even-toolkit --include=*.ts)",
       "Bash(grep -n \"return {\" /Users/shibomb/Documents/projects/even-dev/even-workout/src/glass/screens/*.ts)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
