@@ -1,8 +1,14 @@
 # Even Pomodoro
 
+![Even Pomodorp](docs/images/banner.png)
+
 A Even Pomodoro timer for **Even Realities G2 glasses**. Hands-free focus sessions with configurable work/break durations and session tracking.
 
 ---
+
+## Demo
+Check your even glasses via Even Hub App ([iOS Beta](https://testflight.apple.com/join/8Qsgnbe1)).
+![Demo](docs/images/qrcode.png)
 
 ## Features
 
