@@ -7,10 +7,10 @@
     "dev": "vite --port 5173 --host",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "qr": "evenhub qr --http --port 5173",
+    "qr": "evenhub qr --http --ip 192.168.11.11 --port 5173",
     "pack": "npm run build && evenhub pack app.json dist -o out.ehpk",
     "run-simulator": "npx @evenrealities/evenhub-simulator@latest -b default http://localhost:5173",
-    "start": "npm run qr & npm run dev & npm run run-simulator"
+    "start": "npm run qr && npm run dev & npm run run-simulator"
   },
   "dependencies": {
     "@evenrealities/even_hub_sdk": "^0.0.9",

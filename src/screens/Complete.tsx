@@ -49,7 +49,7 @@ export default function Complete() {
           </div>
         </Card>
 
-        <Button variant="default" onClick={() => navigate('/')} className="w-full">
+        <Button variant="default" onClick={() => navigate('/', { replace: true })} className="w-full">
           <IcMenuHome className="w-5 h-5" />
         </Button>
       </div>
