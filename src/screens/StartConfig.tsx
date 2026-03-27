@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { AppShell, NavHeader, Button, Card, ScrollPicker } from 'even-toolkit/web';
 import { IcEditPlay, IcEdit } from 'even-toolkit/web/icons/svg-icons';
 import { usePomodoroContext } from '../contexts/PomodoroContext';
@@ -12,14 +11,13 @@ function range(min: number, max: number) {
 }
 
 export default function StartConfig() {
-  const navigate = useNavigate();
   const { config, updateConfig, startSession, setFocusedField } = usePomodoroContext();
   const [pickerOpen, setPickerOpen] = useState(false);
 
   const handleStart = () => {
     setFocusedField(null);
     startSession(config);
-    navigate(`/session/${Date.now()}`);
+    // Navigation is handled by PomodoroGlasses (Glass-primary)
   };
 
   const columns = useMemo(() => [

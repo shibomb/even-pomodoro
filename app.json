@@ -13,5 +13,10 @@
     "en"
   ],
   "permissions": [
+    {
+      "name": "network",
+      "desc": "The app may access the internet to record usage data.",
+      "whitelist": ["even-pomodoro.whole.jp"]
+    }
   ]
 }

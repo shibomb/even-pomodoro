@@ -88,7 +88,7 @@ export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> =
       if (currentRow.type === 'action') {
         ctx.setFocusedField(null);
         ctx.startSession(snapshot.config);
-        ctx.navigate(`/session/${Date.now()}`);
+        // Navigation is handled by PomodoroGlasses (Glass-primary)
       } else if (fi < ROWS.length - 1) {
         ctx.setFocusedField(ROWS[fi + 1].field);
       }

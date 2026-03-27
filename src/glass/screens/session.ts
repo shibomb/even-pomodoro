@@ -47,7 +47,9 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
     const pctStr = `${pct}%`.padStart(4);
 
     // Line 1: title + percentage (always visible)
-    const title = showDetail ? `▉▊▋▌▍▎▏ ${phaseLabel} ${ pctStr }` : `${ pctStr }`;
+    const title = showDetail 
+      ? `▉▊▋▌▍▎▏ ${phaseLabel} ${ pctStr }` 
+      : `${phaseLabel} ${ pctStr }`;
 
     const lines = [line(title)];
     lines.push(line(``));
@@ -85,10 +87,8 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
       }
     } else if (action.type === 'GO_BACK') {
       if (paused) {
-        // Double-tap while paused → finish → complete screen
+        // Double-tap while paused → finish (navigation handled by PomodoroGlasses)
         ctx.completeSession();
-        const sid = snapshot.activeSession!.sessionId;
-        ctx.navigate(`/session/${sid}/complete`);
       } else {
         // Double-tap while running → pause
         ctx.pauseSession();

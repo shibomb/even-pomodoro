@@ -25,6 +25,9 @@ interface PomodoroContextValue {
   resumeSession: () => void;
   skipPhase: () => void;
   completeSession: () => void;
+  clearSession: () => void;
+  /** Check if phaseDeadline has passed and transition phases. Safe to call repeatedly. */
+  transitionIfExpired: () => void;
 
   // Config actions
   updateConfig: (partial: Partial<PomodoroConfig>) => void;
@@ -181,6 +184,44 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     setActiveSession((prev) => (prev ? { ...prev, isRunning: false, finishedAt: Date.now(), phaseDeadline: null } : null));
   }, []);
 
+  const clearSession = useCallback(() => {
+    setActiveSession(null);
+  }, []);
+
+  // Safe to call repeatedly — only transitions if phaseDeadline has actually passed
+  const transitionIfExpired = useCallback(() => {
+    setActiveSession((prev) => {
+      if (!prev || !prev.isRunning || !prev.phaseDeadline) return prev;
+      const now = Date.now();
+      const remaining = (prev.phaseDeadline - now) / 1000;
+      if (remaining > 0) return prev;
+
+      // Phase expired — transition
+      if (prev.phase === 'work') {
+        const breakSeconds = config.breakDuration * 60;
+        return {
+          ...prev,
+          phase: 'break' as const,
+          timeRemaining: breakSeconds,
+          phaseDeadline: now + breakSeconds * 1000,
+        };
+      }
+      // Break ended
+      if (prev.cycleNumber >= config.sessionsPerCycle) {
+        return { ...prev, timeRemaining: 0, isRunning: false, finishedAt: now, phaseDeadline: null };
+      }
+      // Next work cycle
+      const workSeconds = config.workDuration * 60;
+      return {
+        ...prev,
+        phase: 'work' as const,
+        cycleNumber: prev.cycleNumber + 1,
+        timeRemaining: workSeconds,
+        phaseDeadline: now + workSeconds * 1000,
+      };
+    });
+  }, [config]);
+
   const updateConfig = useCallback((partial: Partial<PomodoroConfig>) => {
     setConfig((prev) => ({ ...prev, ...partial }));
   }, []);
@@ -199,6 +240,8 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     resumeSession,
     skipPhase,
     completeSession,
+    clearSession,
+    transitionIfExpired,
     updateConfig,
     setFocusedField,
     setLanguage,

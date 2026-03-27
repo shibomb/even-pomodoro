@@ -45,10 +45,9 @@ export const completeScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
   },
 
   action(action, nav, _snapshot: PomodoroSnapshot, ctx: PomodoroActions) {
-    if (action.type === 'SELECT_HIGHLIGHTED') {
-      ctx.navigate('/');
-    } else if (action.type === 'GO_BACK') {
-      ctx.navigate('/');
+    if (action.type === 'SELECT_HIGHLIGHTED' || action.type === 'GO_BACK') {
+      // Clear session → PomodoroGlasses navigates to home
+      ctx.clearSession();
     }
     return nav;
   },

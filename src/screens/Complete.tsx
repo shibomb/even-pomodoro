@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router';
 import { AppShell, NavHeader, Button, Card } from 'even-toolkit/web';
 import { IcMenuHome } from 'even-toolkit/web/icons/svg-icons';
 import { usePomodoroContext } from '../contexts/PomodoroContext';
@@ -15,8 +14,7 @@ function formatTime(seconds: number): string {
 }
 
 export default function Complete() {
-  const navigate = useNavigate();
-  const { activeSession, config } = usePomodoroContext();
+  const { activeSession, config, clearSession } = usePomodoroContext();
 
   if (!activeSession || activeSession.finishedAt === null) {
     return null;
@@ -49,7 +47,7 @@ export default function Complete() {
           </div>
         </Card>
 
-        <Button variant="default" onClick={() => navigate('/', { replace: true })} className="w-full">
+        <Button variant="default" onClick={clearSession} className="w-full">
           <IcMenuHome className="w-5 h-5" />
         </Button>
       </div>

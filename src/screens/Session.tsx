@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
 import { AppShell, NavHeader, Button, TimerRing } from 'even-toolkit/web';
 import { IcEditPause, IcEditPlay, IcStatusComplete } from 'even-toolkit/web/icons/svg-icons';
 import { usePomodoroContext } from '../contexts/PomodoroContext';
@@ -12,17 +10,10 @@ function formatTime(seconds: number): string {
 }
 
 export default function Session() {
-  const navigate = useNavigate();
   const { activeSession, config, pauseSession, resumeSession, completeSession } = usePomodoroContext();
 
-  useEffect(() => {
-    if (!activeSession) {
-      navigate('/', { replace: true });
-    } else if (activeSession.finishedAt) {
-      navigate(`/session/${activeSession.sessionId}/complete`, { replace: true });
-    }
-  }, [activeSession, activeSession?.finishedAt, navigate]);
-
+  // Navigation is handled by PomodoroGlasses (Glass-primary).
+  // This screen only renders the current state.
   if (!activeSession || activeSession.finishedAt) return null;
 
   const phase = activeSession.phase;

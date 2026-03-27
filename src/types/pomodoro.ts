@@ -48,6 +48,10 @@ export interface PomodoroActions {
   resumeSession: () => void;
   skipPhase: () => void;
   completeSession: () => void;
+  /** Clear the active session (return to home). */
+  clearSession: () => void;
+  /** Check if phaseDeadline has passed and transition phases. Safe to call repeatedly. */
+  transitionIfExpired: () => void;
   updateConfig: (partial: Partial<PomodoroConfig>) => void;
   setFocusedField: (field: ConfigField) => void;
 }
