@@ -11,6 +11,16 @@ function formatTime(seconds: number): string {
   return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 }
 
+/** Compute remaining seconds from phaseDeadline (running) or stored timeRemaining (paused) */
+function getRemaining(snapshot: PomodoroSnapshot): number {
+  const s = snapshot.activeSession;
+  if (!s) return 0;
+  if (s.phaseDeadline) {
+    return Math.max(0, (s.phaseDeadline - Date.now()) / 1000);
+  }
+  return s.timeRemaining;
+}
+
 function calcPercent(snapshot: PomodoroSnapshot): number {
   const s = snapshot.activeSession;
   if (!s) return 0;
@@ -18,7 +28,8 @@ function calcPercent(snapshot: PomodoroSnapshot): number {
     ? snapshot.config.workDuration * 60
     : snapshot.config.breakDuration * 60;
   if (total === 0) return 0;
-  return Math.round(((total - s.timeRemaining) / total) * 100);
+  const remaining = getRemaining(snapshot);
+  return Math.round(((total - remaining) / total) * 100);
 }
 
 export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
@@ -43,7 +54,7 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
 
     if (showDetail) {
       // Detail line: WORKING 53% [12:34] (2/4)
-      lines.push(line(`${phaseLabel} ${pctStr} [${formatTime(s.timeRemaining)}] (${s.cycleNumber}/${snapshot.config.sessionsPerCycle})`));
+      lines.push(line(`${phaseLabel} ${pctStr} [${formatTime(getRemaining(snapshot))}] (${s.cycleNumber}/${snapshot.config.sessionsPerCycle})`));
       lines.push(line(paused ? `PAUSED` : ``));
     }
 

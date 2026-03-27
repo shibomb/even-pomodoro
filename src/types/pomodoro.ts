@@ -20,11 +20,12 @@ export interface ActivePomodoroSession {
   sessionId: string;
   phase: PomodoroPhase;
   cycleNumber: number;       // 1-indexed
-  timeRemaining: number;     // seconds
+  timeRemaining: number;     // seconds (computed from phaseDeadline when running)
   totalTimeRemaining: number; // total for session
   startedAt: number;         // timestamp ms
   isRunning: boolean;
   finishedAt: number | null; // timestamp ms when completed
+  phaseDeadline: number | null; // timestamp ms when current phase ends (null when paused)
 }
 
 /**

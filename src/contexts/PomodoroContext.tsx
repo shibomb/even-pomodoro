@@ -54,66 +54,94 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     saveLanguage(language);
   }, [language]);
 
-  // Countdown timer: decrement timeRemaining every 0.1s when running
-  // Handles phase transitions (work→break→work→...→complete) automatically
+  // Countdown timer: compute timeRemaining from phaseDeadline (timestamp-based)
+  // This ensures accuracy even when the app is backgrounded and setInterval is throttled
   useEffect(() => {
     if (!activeSession || !activeSession.isRunning) return;
 
-    const interval = setInterval(() => {
+    const tick = () => {
       setActiveSession((prev) => {
-        if (!prev || !prev.isRunning) return prev;
-        const next = Math.round((prev.timeRemaining - 0.1) * 10) / 10;
-        if (next > 0) {
-          return { ...prev, timeRemaining: next };
+        if (!prev || !prev.isRunning || !prev.phaseDeadline) return prev;
+        const now = Date.now();
+        const remaining = Math.max(0, (prev.phaseDeadline - now) / 1000);
+
+        if (remaining > 0) {
+          return { ...prev, timeRemaining: Math.round(remaining * 10) / 10 };
         }
         // Time's up — transition to next phase
         if (prev.phase === 'work') {
+          const breakSeconds = config.breakDuration * 60;
           return {
             ...prev,
             phase: 'break' as const,
-            timeRemaining: config.breakDuration * 60,
+            timeRemaining: breakSeconds,
+            phaseDeadline: now + breakSeconds * 1000,
           };
         }
         // Break ended
         if (prev.cycleNumber >= config.sessionsPerCycle) {
           // All cycles done
-          return { ...prev, timeRemaining: 0, isRunning: false, finishedAt: Date.now() };
+          return { ...prev, timeRemaining: 0, isRunning: false, finishedAt: now, phaseDeadline: null };
         }
         // Next work cycle
+        const workSeconds = config.workDuration * 60;
         return {
           ...prev,
           phase: 'work' as const,
           cycleNumber: prev.cycleNumber + 1,
-          timeRemaining: config.workDuration * 60,
+          timeRemaining: workSeconds,
+          phaseDeadline: now + workSeconds * 1000,
         };
       });
-    }, 100);
+    };
+
+    const interval = setInterval(tick, 100);
+    // Run immediately on resume/foreground to catch up
+    tick();
 
     return () => clearInterval(interval);
   }, [activeSession?.isRunning, activeSession?.phase, activeSession?.cycleNumber, config]);
 
   const startSession = useCallback((cfg: PomodoroConfig) => {
     const sessionId = `session-${Date.now()}`;
+    const now = Date.now();
     const totalSeconds = (cfg.workDuration + cfg.breakDuration) * 60 * cfg.sessionsPerCycle;
+    const workSeconds = cfg.workDuration * 60;
 
     setActiveSession({
       sessionId,
       phase: 'work',
       cycleNumber: 1,
-      timeRemaining: cfg.workDuration * 60,
+      timeRemaining: workSeconds,
       totalTimeRemaining: totalSeconds,
-      startedAt: Date.now(),
+      startedAt: now,
       isRunning: true,
       finishedAt: null,
+      phaseDeadline: now + workSeconds * 1000,
     });
   }, []);
 
   const pauseSession = useCallback(() => {
-    setActiveSession((prev) => (prev ? { ...prev, isRunning: false } : null));
+    setActiveSession((prev) => {
+      if (!prev) return null;
+      // Snapshot remaining time from deadline, clear deadline
+      const remaining = prev.phaseDeadline
+        ? Math.max(0, (prev.phaseDeadline - Date.now()) / 1000)
+        : prev.timeRemaining;
+      return { ...prev, isRunning: false, timeRemaining: remaining, phaseDeadline: null };
+    });
   }, []);
 
   const resumeSession = useCallback(() => {
-    setActiveSession((prev) => (prev ? { ...prev, isRunning: true } : null));
+    setActiveSession((prev) => {
+      if (!prev) return null;
+      // Set new deadline from stored timeRemaining
+      return {
+        ...prev,
+        isRunning: true,
+        phaseDeadline: Date.now() + prev.timeRemaining * 1000,
+      };
+    });
   }, []);
 
   const skipPhase = useCallback(() => {
@@ -122,22 +150,27 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
 
       const { phase, cycleNumber } = prev;
       const cfg = config;
+      const now = Date.now();
 
       if (phase === 'work') {
+        const breakSeconds = cfg.breakDuration * 60;
         return {
           ...prev,
           phase: 'break' as const,
-          timeRemaining: cfg.breakDuration * 60,
+          timeRemaining: breakSeconds,
+          phaseDeadline: prev.isRunning ? now + breakSeconds * 1000 : null,
         };
       } else {
         if (cycleNumber >= cfg.sessionsPerCycle) {
-          return { ...prev, isRunning: false, finishedAt: Date.now() };
+          return { ...prev, isRunning: false, finishedAt: now, phaseDeadline: null };
         } else {
+          const workSeconds = cfg.workDuration * 60;
           return {
             ...prev,
             phase: 'work' as const,
             cycleNumber: cycleNumber + 1,
-            timeRemaining: cfg.workDuration * 60,
+            timeRemaining: workSeconds,
+            phaseDeadline: prev.isRunning ? now + workSeconds * 1000 : null,
           };
         }
       }
@@ -145,7 +178,7 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
   }, [config]);
 
   const completeSession = useCallback(() => {
-    setActiveSession((prev) => (prev ? { ...prev, isRunning: false, finishedAt: Date.now() } : null));
+    setActiveSession((prev) => (prev ? { ...prev, isRunning: false, finishedAt: Date.now(), phaseDeadline: null } : null));
   }, []);
 
   const updateConfig = useCallback((partial: Partial<PomodoroConfig>) => {
