@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@evenrealities/even_hub_sdk": ["./node_modules/@evenrealities/even_hub_sdk"],
+      "@jappyjan/even-better-sdk": ["./node_modules/@jappyjan/even-better-sdk"],
+      "react": ["./node_modules/@types/react"],
+      "react-router": ["./node_modules/react-router"]
+    }
+  },
+  "include": ["src"]
+}
