@@ -1,0 +1,17 @@
+{
+  "package_id": "xyz.shibomb.evenpomodoroeveng2",
+  "edition": "202601",
+  "name": "Pomodoro Timer",
+  "version": "1.0.0",
+  "min_app_version": "2.1.0",
+  "min_sdk_version": "0.0.9",
+  "tagline": "Simple Pomodoro Timer",
+  "description": "A simple Pomodoro Timer app for Even G2, designed to help you manage your time effectively and boost productivity. With a user-friendly interface and customizable settings, this app allows you to set work intervals and break times, keeping you focused and refreshed throughout the day.",
+  "author": "shibomb",
+  "entrypoint": "index.html",
+  "supported_languages": [
+    "en"
+  ],
+  "permissions": [
+  ]
+}
