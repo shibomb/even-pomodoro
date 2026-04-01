@@ -10,7 +10,11 @@ const SETTINGS_KEY = 'even-pomodoro:settings';
 export function loadConfig(): PomodoroConfig {
   try {
     const raw = localStorage.getItem(CONFIG_KEY);
-    return raw ? JSON.parse(raw) : DEFAULT_CONFIG;
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      return { ...DEFAULT_CONFIG, ...parsed };
+    }
+    return DEFAULT_CONFIG;
   } catch {
     return DEFAULT_CONFIG;
   }

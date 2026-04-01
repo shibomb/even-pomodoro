@@ -1,6 +1,7 @@
 import type { GlassScreen } from 'even-toolkit/glass-screen-router';
 import { line } from 'even-toolkit/types';
 import { PomodoroSnapshot, PomodoroActions } from '../pomodoroShared';
+import { getDotNumberTwoDigits } from '../dotFontNumber';
 
 // G2 display: ~28 chars wide, 10 lines max
 
@@ -39,6 +40,7 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
     }
 
     const s = snapshot.activeSession;
+    const remaining = getRemaining(snapshot);
     const pct = calcPercent(snapshot);
     const paused = !s.isRunning;
     const showDetail = paused || Date.now() < ((nav as any).detailUntil ?? 0);
@@ -47,26 +49,49 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
     const pctStr = `${pct}%`.padStart(4);
 
     // Line 1: title + percentage (always visible)
-    const title = showDetail 
-      ? `▉▊▋▌▍▎▏ ${phaseLabel} ${ pctStr }` 
-      : `${phaseLabel} ${ pctStr }`;
+    // If user sets ALWAYS SHOW DETAIL ON, show the detail line on line1 even when not explicitly detail mode.
+    const title = showDetail
+      ? `▉▊▋▌▍▎▏ ${phaseLabel} ${ pctStr }`
+      : snapshot.config.alwaysShowDetail
+        ? `${phaseLabel} ${pctStr} [${formatTime(remaining)}] (${s.cycleNumber}/${snapshot.config.sessionsPerCycle})`
+        : `${phaseLabel} ${pctStr}`;
 
     const lines = [line(title)];
     lines.push(line(``));
 
-    if (showDetail) {
+    // Show large countdown numbers for last 9 seconds (when running and seconds < 10)
+    const isCountdown = !paused && remaining < 10;
+
+    if (isCountdown) {
+      // Display large dot-matrix numbers for countdown
+      const dotLines = getDotNumberTwoDigits(remaining);
+      dotLines.forEach(dotLine => {
+        lines.push(line(dotLine));
+      });
+      // Pad remaining
+      while (lines.length < 10) lines.push(line(''));
+    } else if (showDetail) {
       // Detail line: WORKING 53% [12:34] (2/4)
       lines.push(line(`${phaseLabel} ${pctStr} [${formatTime(getRemaining(snapshot))}] (${s.cycleNumber}/${snapshot.config.sessionsPerCycle})`));
       lines.push(line(paused ? `PAUSED` : ``));
-    }
 
-    if (paused) {
-      // Pad then show controls
-      while (lines.length < 9) lines.push(line(''));
-      lines.push(line('[CLICK]Resume [x2]Finish'));
+      if (paused) {
+        // Pad then show controls
+        while (lines.length < 9) lines.push(line(''));
+        lines.push(line('[CLICK]Resume [x2]Finish'));
+      } else {
+        // Pad to 10 lines
+        while (lines.length < 10) lines.push(line(''));
+      }
     } else {
-      // Pad to 10 lines
-      while (lines.length < 10) lines.push(line(''));
+      if (paused) {
+        // Pad then show controls
+        while (lines.length < 9) lines.push(line(''));
+        lines.push(line('[CLICK]Resume [x2]Finish'));
+      } else {
+        // Pad to 10 lines
+        while (lines.length < 10) lines.push(line(''));
+      }
     }
 
     return { lines };

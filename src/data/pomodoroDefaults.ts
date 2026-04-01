@@ -6,4 +6,5 @@ export const DEFAULT_CONFIG: PomodoroConfig = {
   sessionsPerCycle: 4,
   autoStartBreak: true,
   autoStartWork: false,
+  alwaysShowDetail: false,
 };

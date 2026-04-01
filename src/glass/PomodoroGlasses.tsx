@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
 import { useGlasses } from 'even-toolkit/useGlasses';
 import { createScreenMapper } from 'even-toolkit/glass-router';
@@ -24,6 +24,20 @@ export function PomodoroGlasses() {
     updateConfig,
     setFocusedField,
   } = usePomodoroContext();
+
+  // ── Force Glass display refresh even when Web is backgrounded ──
+  // When Web bg-throttles its setInterval, we need Glass to independently
+  // trigger display updates via snapshot re-creation
+  const [tick, setTick] = useState(0);
+
+  // Trigger glass screen refresh at regular interval (100ms)
+  // This ensures glass gets updates even if web is backgrounded
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTick(prev => prev + 1);
+    }, 100);
+    return () => clearInterval(interval);
+  }, []);
 
   // ── Central navigation controller (Glass-primary) ──
   // All screen transitions are driven from here based on state changes.
@@ -53,19 +67,21 @@ export function PomodoroGlasses() {
     prevFinishedAtRef.current = finishedAt;
   }, [activeSession?.sessionId, activeSession?.finishedAt, navigate]);
 
-  // ── Glass-side timer expiry check ──
-  // Independent of PomodoroContext's timer — ensures phase transitions
-  // happen even if the web-side setInterval is throttled
+  // ── Force Glass display refresh even when Web is backgrounded ──
+  // Use a shorter interval on glass side to ensure updates reach the device
+  // even if web-side setInterval is throttled
   useEffect(() => {
-    if (!activeSession?.isRunning || !activeSession?.phaseDeadline) return;
+    if (!activeSession?.isRunning) return;
 
+    // Trigger transitionIfExpired and ensure glass device sees updates
+    // even if web state isn't changing (display calls Date.now() directly)
     const interval = setInterval(() => {
       transitionIfExpired();
-    }, 200);
+    }, 100);  // Shorter interval than before
     transitionIfExpired();
 
     return () => clearInterval(interval);
-  }, [activeSession?.isRunning, activeSession?.phaseDeadline, transitionIfExpired]);
+  }, [activeSession?.isRunning, transitionIfExpired]);
 
   // Map URL patterns to glass screens
   const deriveScreen = createScreenMapper(
@@ -78,11 +94,13 @@ export function PomodoroGlasses() {
   );
 
   // Create immutable snapshot of current state for glass
+  // Include tick to force snapshot re-creation even when state doesn't change
   const snapshot: PomodoroSnapshot = {
     activeSession,
     config,
     focusedField,
     language,
+    _tick: tick, // Include tick to ensure snapshot updates trigger glass refresh
   };
 
   // Create action context for side effects

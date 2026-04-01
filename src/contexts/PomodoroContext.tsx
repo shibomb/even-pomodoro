@@ -102,7 +102,19 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
     // Run immediately on resume/foreground to catch up
     tick();
 
-    return () => clearInterval(interval);
+    // Handle app coming back to foreground from background
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        // App is now visible, sync time by running tick immediately
+        tick();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [activeSession?.isRunning, activeSession?.phase, activeSession?.cycleNumber, config]);
 
   const startSession = useCallback((cfg: PomodoroConfig) => {

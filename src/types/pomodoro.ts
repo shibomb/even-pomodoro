@@ -11,6 +11,7 @@ export interface PomodoroConfig {
   sessionsPerCycle: number;  // number of cycles
   autoStartBreak: boolean;
   autoStartWork: boolean;
+  alwaysShowDetail: boolean;
 }
 
 /**
@@ -36,6 +37,7 @@ export interface PomodoroSnapshot {
   config: PomodoroConfig;
   focusedField: ConfigField;
   language: AppLanguage;
+  _tick?: number; // Internal: used to trigger glass refresh on interval
 }
 
 /**

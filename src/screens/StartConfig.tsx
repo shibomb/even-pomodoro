@@ -40,6 +40,10 @@ export default function StartConfig() {
     });
   };
 
+  const handleAlwaysShowDetail = (value: boolean) => {
+    updateConfig({ alwaysShowDetail: value });
+  };
+
   return (
     <AppShell
       header={
@@ -69,6 +73,30 @@ export default function StartConfig() {
         <Button variant="secondary" onClick={() => setPickerOpen(true)} className="w-full">
           <IcEdit className="w-5 h-5" />
         </Button>
+
+        <div className="p-4 rounded-xl border border-neutral-200 bg-white">
+          <div className="mb-2 text-sm font-semibold">ALWAYS SHOW DETAIL</div>
+          <div className="flex gap-3">
+            <label className="inline-flex items-center gap-2">
+              <input
+                type="radio"
+                name="alwaysShowDetail"
+                checked={config.alwaysShowDetail === true}
+                onChange={() => handleAlwaysShowDetail(true)}
+              />
+              <span>ON</span>
+            </label>
+            <label className="inline-flex items-center gap-2">
+              <input
+                type="radio"
+                name="alwaysShowDetail"
+                checked={config.alwaysShowDetail === false}
+                onChange={() => handleAlwaysShowDetail(false)}
+              />
+              <span>OFF</span>
+            </label>
+          </div>
+        </div>
 
         <Button variant="default" onClick={handleStart} className="w-full">
           <IcEditPlay className="w-5 h-5" />
