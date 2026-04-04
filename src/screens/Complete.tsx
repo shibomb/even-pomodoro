@@ -31,7 +31,7 @@ export default function Complete() {
     >
       <div className="px-3 pt-8 pb-8 flex flex-col items-center gap-6">
         <div className="text-center">
-          <div className="text-[20px] font-bold">Great work!</div>
+          <div className="text-[20px] font-bold">{config.textGreatWork}</div>
         </div>
 
         <Card className="w-full p-4">

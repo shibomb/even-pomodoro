@@ -12,6 +12,13 @@ export interface PomodoroConfig {
   autoStartBreak: boolean;
   autoStartWork: boolean;
   alwaysShowDetail: boolean;
+  showClock: boolean;
+  // Customizable display texts
+  textWork: string;
+  textWorking: string;
+  textBreak: string;
+  textBreaking: string;
+  textGreatWork: string;
 }
 
 /**

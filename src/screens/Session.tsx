@@ -20,7 +20,7 @@ export default function Session() {
   const totalSeconds = phase === 'work'
     ? config.workDuration * 60
     : config.breakDuration * 60;
-  const phaseLabel = phase === 'work' ? 'Working' : 'Breaking';
+  const phaseLabel = phase === 'work' ? config.textWorking : config.textBreaking;
 
   return (
     <AppShell

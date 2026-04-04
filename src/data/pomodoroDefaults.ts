@@ -7,4 +7,10 @@ export const DEFAULT_CONFIG: PomodoroConfig = {
   autoStartBreak: true,
   autoStartWork: false,
   alwaysShowDetail: false,
+  showClock: false,
+  textWork: 'WORK',
+  textWorking: 'WORKING',
+  textBreak: 'BREAK',
+  textBreaking: 'BREAKING',
+  textGreatWork: 'GREAT WORK!',
 };

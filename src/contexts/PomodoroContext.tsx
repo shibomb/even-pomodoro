@@ -47,9 +47,10 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<AppLanguage>(() => loadLanguage());
   const [focusedField, setFocusedField] = useState<ConfigField>(null);
 
-  // Persist config changes
+  // Persist config changes (debounced to avoid blocking rapid swipe updates)
   useEffect(() => {
-    saveConfig(config);
+    const timer = setTimeout(() => saveConfig(config), 300);
+    return () => clearTimeout(timer);
   }, [config]);
 
   // Persist language changes

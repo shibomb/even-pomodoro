@@ -29,7 +29,7 @@ export const completeScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
     const target = snapshot.config.sessionsPerCycle;
 
     const lines = [
-        line('▉▊▋▌▍▎▏ GREAT WORK!'),
+        line(`▉▊▋▌▍▎▏ ${snapshot.config.textGreatWork}`),
         line(''),
         line(`Cycles: ${cycles}/${target}`),
         line(`Time:   ${formatDuration(duration)}`),

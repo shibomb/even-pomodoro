@@ -11,12 +11,14 @@ type RowDef =
   | { type: 'field'; field: 'workDuration' | 'breakDuration' | 'cycles'; label: string; unit: string }
   | { type: 'action'; field: 'start'; label: string };
 
-const ROWS: RowDef[] = [
-  { type: 'field',  field: 'workDuration',  label: 'WORK ',  unit: 'min.' },
-  { type: 'field',  field: 'breakDuration', label: 'BREAK', unit: 'min.' },
-  { type: 'field',  field: 'cycles',        label: 'CYCLE', unit: 'times' },
-  { type: 'action', field: 'start',         label: '[START]' },
-];
+function getRows(snapshot: PomodoroSnapshot): RowDef[] {
+  return [
+    { type: 'field',  field: 'workDuration',  label: snapshot.config.textWork,  unit: 'min.' },
+    { type: 'field',  field: 'breakDuration', label: snapshot.config.textBreak, unit: 'min.' },
+    { type: 'field',  field: 'cycles',        label: 'CYCLE', unit: 'times' },
+    { type: 'action', field: 'start',         label: '[START]' },
+  ];
+}
 
 function fieldRange(field: string): { min: number; max: number } {
   switch (field) {
@@ -36,27 +38,32 @@ function getFieldValue(field: string, snapshot: PomodoroSnapshot): number {
   }
 }
 
-function focusedIndex(focusedField: ConfigField): number {
+function focusedIndex(focusedField: ConfigField, rows: RowDef[]): number {
   if (!focusedField) return 0;
-  const idx = ROWS.findIndex(r => r.field === focusedField);
+  const idx = rows.findIndex(r => r.field === focusedField);
   return idx >= 0 ? idx : 0;
 }
 
 export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
   display(snapshot: PomodoroSnapshot) {
-    const fi = focusedIndex(snapshot.focusedField);
+    const rows = getRows(snapshot);
+    const fi = focusedIndex(snapshot.focusedField, rows);
+
+    // Compute max label width among field rows for alignment
+    const maxLabel = rows.reduce((max, r) => r.type === 'field' ? Math.max(max, r.label.length) : max, 0);
+    const pad = maxLabel + 1; // +1 for spacing before value
 
     const lines = [
       line('▉▊▋▌▍▎▏ POMODORO TIMER'),
       line(``)
     ];
 
-    for (let i = 0; i < ROWS.length; i++) {
-      const row = ROWS[i];
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
       const cursor = i === fi ? '☞ ' : '　 ';
       if (row.type === 'field') {
         const val = String(getFieldValue(row.field, snapshot)).padStart(3);
-        lines.push(line(`${cursor}${row.label.padEnd(8)}${val} ${row.unit}`));
+        lines.push(line(`${cursor}${row.label.padEnd(pad)}${val} ${row.unit}`));
       } else {
         lines.push(line(`${cursor}${row.label}`));
       }
@@ -70,8 +77,9 @@ export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> =
   },
 
   action(action, nav, snapshot: PomodoroSnapshot, ctx: PomodoroActions) {
-    const fi = focusedIndex(snapshot.focusedField);
-    const currentRow = ROWS[fi];
+    const rows = getRows(snapshot);
+    const fi = focusedIndex(snapshot.focusedField, rows);
+    const currentRow = rows[fi];
 
     if (action.type === 'HIGHLIGHT_MOVE') {
       if (currentRow.type === 'field') {
@@ -89,12 +97,12 @@ export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> =
         ctx.setFocusedField(null);
         ctx.startSession(snapshot.config);
         // Navigation is handled by PomodoroGlasses (Glass-primary)
-      } else if (fi < ROWS.length - 1) {
-        ctx.setFocusedField(ROWS[fi + 1].field);
+      } else if (fi < rows.length - 1) {
+        ctx.setFocusedField(rows[fi + 1].field);
       }
     } else if (action.type === 'GO_BACK') {
       if (fi > 0) {
-        ctx.setFocusedField(ROWS[fi - 1].field);
+        ctx.setFocusedField(rows[fi - 1].field);
       }
     }
 

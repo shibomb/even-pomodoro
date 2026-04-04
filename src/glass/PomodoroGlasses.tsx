@@ -5,6 +5,7 @@ import { createScreenMapper } from 'even-toolkit/glass-router';
 import { usePomodoroContext } from '../contexts/PomodoroContext';
 import { PomodoroSnapshot, PomodoroActions } from './pomodoroShared';
 import { toDisplayData, onGlassAction as onGAAction } from './pomodoroSelectors';
+import { useClockOverlay } from './useClockOverlay';
 
 export function PomodoroGlasses() {
   const navigate = useNavigate();
@@ -82,6 +83,9 @@ export function PomodoroGlasses() {
 
     return () => clearInterval(interval);
   }, [activeSession?.isRunning, transitionIfExpired]);
+
+  // Clock overlay on glass (separate text container at top-right)
+  useClockOverlay(config.showClock);
 
   // Map URL patterns to glass screens
   const deriveScreen = createScreenMapper(

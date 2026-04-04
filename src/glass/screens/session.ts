@@ -45,16 +45,18 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
     const paused = !s.isRunning;
     const showDetail = paused || Date.now() < ((nav as any).detailUntil ?? 0);
 
-    const phaseLabel = s.phase === 'work' ? 'WORKING' : 'BREAKING';
+    const phaseLabel = s.phase === 'work' ? snapshot.config.textWorking : snapshot.config.textBreaking;
     const pctStr = `${pct}%`.padStart(4);
 
     // Line 1: title + percentage (always visible)
     // If user sets ALWAYS SHOW DETAIL ON, show the detail line on line1 even when not explicitly detail mode.
-    const title = showDetail
+    const rawTitle = showDetail
       ? `▉▊▋▌▍▎▏ ${phaseLabel} ${ pctStr }`
       : snapshot.config.alwaysShowDetail
         ? `${phaseLabel} ${pctStr} [${formatTime(remaining)}] (${s.cycleNumber}/${snapshot.config.sessionsPerCycle})`
         : `${phaseLabel} ${pctStr}`;
+
+    const title = rawTitle;
 
     const lines = [line(title)];
     lines.push(line(``));
