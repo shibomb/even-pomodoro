@@ -1,6 +1,6 @@
 import { PomodoroConfig, AppLanguage } from '../types/pomodoro';
 import { DEFAULT_CONFIG } from './pomodoroDefaults';
-import { initStorage, getItem, setItem } from './bridgeStorage';
+import { initStorage, syncFromBridge, getItem, setItem } from './bridgeStorage';
 
 export const CONFIG_KEY = 'even-pomodoro:config';
 export const SETTINGS_KEY = 'even-pomodoro:settings';
@@ -14,6 +14,14 @@ export const ALL_STORAGE_KEYS = [CONFIG_KEY, SETTINGS_KEY];
  */
 export async function initPersistence(): Promise<void> {
   await initStorage(ALL_STORAGE_KEYS);
+}
+
+/**
+ * Re-sync from bridge storage after bridge becomes available at runtime.
+ * Returns true if any values changed (caller should reload config/language).
+ */
+export async function syncPersistenceFromBridge(): Promise<boolean> {
+  return syncFromBridge(ALL_STORAGE_KEYS);
 }
 
 /**

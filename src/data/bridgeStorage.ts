@@ -63,6 +63,30 @@ export function getItem(key: string): string | null {
   return cache.get(key) ?? null;
 }
 
+/**
+ * Re-sync cache from bridge storage after bridge becomes available.
+ * Returns true if any cached values changed (caller should reload state).
+ */
+export async function syncFromBridge(keys: string[]): Promise<boolean> {
+  const b = getBridge();
+  if (!b) return false;
+
+  let changed = false;
+  await Promise.all(
+    keys.map(async (key) => {
+      try {
+        const value = await b.getLocalStorage(key);
+        const prev = cache.get(key) ?? null;
+        if (value && value !== prev) {
+          cache.set(key, value);
+          changed = true;
+        }
+      } catch { /* ignore */ }
+    }),
+  );
+  return changed;
+}
+
 /** Write-through: update cache immediately, persist in background. */
 export function setItem(key: string, value: string): void {
   cache.set(key, value);

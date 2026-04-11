@@ -10,6 +10,7 @@ import {
   saveConfig,
   loadLanguage,
   saveLanguage,
+  syncPersistenceFromBridge,
 } from '../data/pomodoroPersistence';
 
 interface PomodoroContextValue {
@@ -57,6 +58,31 @@ export function PomodoroProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     saveLanguage(language);
   }, [language]);
+
+  // Re-sync from bridge storage once the bridge becomes available at runtime.
+  // On G2 glasses, the bridge is created by useGlasses after mount, so the
+  // initial initPersistence() (in main.tsx) falls back to empty localStorage.
+  // This effect polls for the bridge and reloads config/language from it.
+  useEffect(() => {
+    let cancelled = false;
+    const timer = setInterval(async () => {
+      if (cancelled) return;
+      const hub = (window as any).__evenBridge;
+      if (!hub?.setLocalStorage) return; // bridge not ready yet
+
+      clearInterval(timer);
+      const changed = await syncPersistenceFromBridge();
+      if (changed && !cancelled) {
+        setConfig(loadConfig());
+        setLanguageState(loadLanguage());
+      }
+    }, 200);
+
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, []);
 
   // Countdown timer: compute timeRemaining from phaseDeadline (timestamp-based)
   // This ensures accuracy even when the app is backgrounded and setInterval is throttled
