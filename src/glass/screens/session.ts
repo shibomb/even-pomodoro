@@ -80,7 +80,7 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
       if (paused) {
         // Pad then show controls
         while (lines.length < 9) lines.push(line(''));
-        lines.push(line('[CLICK]Resume [x2]Finish'));
+        lines.push(line('[Tap]Resume [x2]Finish'));
       } else {
         // Pad to 10 lines
         while (lines.length < 10) lines.push(line(''));
@@ -89,7 +89,7 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
       if (paused) {
         // Pad then show controls
         while (lines.length < 9) lines.push(line(''));
-        lines.push(line('[CLICK]Resume [x2]Finish'));
+        lines.push(line('[Tap]Resume [x2]Finish'));
       } else {
         // Pad to 10 lines
         while (lines.length < 10) lines.push(line(''));
@@ -106,10 +106,10 @@ export const sessionScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
 
     if (action.type === 'SELECT_HIGHLIGHTED') {
       if (paused) {
-        // Click while paused → resume
+        // Tap while paused → resume
         ctx.resumeSession();
       } else {
-        // Click while running → show detail for 5 seconds
+        // Tap while running → show detail for 5 seconds
         return { ...nav, detailUntil: Date.now() + 5000 };
       }
     } else if (action.type === 'GO_BACK') {

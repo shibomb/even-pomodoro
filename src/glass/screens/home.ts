@@ -22,12 +22,12 @@ export const homeScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
       line(`${config.textBreak} ${config.breakDuration}min`),
       line(`${config.textCycle} ${config.sessionsPerCycle}`),
       line(''),
-      line(`${sel === 0 ? '☞ ' : '　 '}[START]`),
-      line(`${sel === 1 ? '☞ ' : '　 '}[CONFIG]`),
+      line(`${sel === 0 ? '> ' : '  '}[Start]`),
+      line(`${sel === 1 ? '> ' : '  '}[Config]`),
     ];
 
     while (lines.length < 9) lines.push(line(''));
-    lines.push(line('[↑↓]Select [CLICK]OK [x2]Exit'));
+    lines.push(line('[↑↓]Move [Tap]Select [x2]Exit'));
 
     return { lines };
   },

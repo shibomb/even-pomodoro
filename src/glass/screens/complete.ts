@@ -37,7 +37,7 @@ export const completeScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
     ]
 
     while (lines.length < 9) lines.push(line(''));
-    lines.push(line('[CLICK]:Home'))
+    lines.push(line('[Tap]:Home'))
 
     return {
       lines: lines

@@ -91,7 +91,7 @@ export function PomodoroGlasses() {
   const deriveScreen = createScreenMapper(
     [
       { pattern: '/', screen: 'home' },
-      { pattern: '/config', screen: 'start-config' },
+      { pattern: '/config', screen: 'config' },
       { pattern: /^\/session\/[^/]+$/, screen: 'session' },
       { pattern: /^\/session\/[^/]+\/complete$/, screen: 'complete' },
     ],

@@ -1,7 +1,7 @@
 import { createGlassScreenRouter } from 'even-toolkit/glass-screen-router';
 import { PomodoroSnapshot, PomodoroActions } from './pomodoroShared';
 import { homeScreen } from './screens/home';
-import { startConfigScreen } from './screens/start-config';
+import { configScreen } from './screens/config';
 import { sessionScreen } from './screens/session';
 import { completeScreen } from './screens/complete';
 
@@ -11,7 +11,7 @@ export const { toDisplayData, onGlassAction } = createGlassScreenRouter<
 >(
   {
     home: homeScreen,
-    'start-config': startConfigScreen,
+    config: configScreen,
     session: sessionScreen,
     complete: completeScreen,
   },

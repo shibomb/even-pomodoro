@@ -16,7 +16,7 @@ function getRows(snapshot: PomodoroSnapshot): RowDef[] {
     { type: 'field',  field: 'workDuration',  label: snapshot.config.textWork,  unit: 'min.' },
     { type: 'field',  field: 'breakDuration', label: snapshot.config.textBreak, unit: 'min.' },
     { type: 'field',  field: 'cycles',        label: snapshot.config.textCycle, unit: 'times' },
-    { type: 'action', field: 'start',         label: '[START]' },
+    { type: 'action', field: 'start',         label: '[Start]' },
   ];
 }
 
@@ -44,7 +44,7 @@ function focusedIndex(focusedField: ConfigField, rows: RowDef[]): number {
   return idx >= 0 ? idx : 0;
 }
 
-export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
+export const configScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
   display(snapshot: PomodoroSnapshot) {
     const rows = getRows(snapshot);
     const fi = focusedIndex(snapshot.focusedField, rows);
@@ -60,7 +60,7 @@ export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> =
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
-      const cursor = i === fi ? '☞ ' : '　 ';
+      const cursor = i === fi ? '> ' : '  ';
       if (row.type === 'field') {
         const val = String(getFieldValue(row.field, snapshot)).padStart(3);
         lines.push(line(`${cursor}${row.label.padEnd(pad)}${val} ${row.unit}`));
@@ -71,7 +71,7 @@ export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> =
 
     // pad to 9 lines then add hint
     while (lines.length < 9) lines.push(line(''));
-    lines.push(line('[↑↓]Adjust [CLICK]Next [x2]Back'));
+    lines.push(line('[↑↓]Adjust [Tap]Next [x2]Back'));
 
     return { lines };
   },
