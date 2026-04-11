@@ -26,19 +26,22 @@ export function PomodoroGlasses() {
     setFocusedField,
   } = usePomodoroContext();
 
-  // ── Force Glass display refresh even when Web is backgrounded ──
+  // ── Force Glass display refresh only during active session ──
   // When Web bg-throttles its setInterval, we need Glass to independently
-  // trigger display updates via snapshot re-creation
+  // trigger display updates via snapshot re-creation.
+  // Only tick during running sessions — on static screens (home, config, complete)
+  // continuous updates cause notifyTextUpdate() to suppress scroll events (80ms window),
+  // leaving only ~20ms for Up/Down input to register.
   const [tick, setTick] = useState(0);
 
-  // Trigger glass screen refresh at regular interval (100ms)
-  // This ensures glass gets updates even if web is backgrounded
+  const isRunning = activeSession?.isRunning ?? false;
   useEffect(() => {
+    if (!isRunning) return;
     const interval = setInterval(() => {
       setTick(prev => prev + 1);
     }, 100);
     return () => clearInterval(interval);
-  }, []);
+  }, [isRunning]);
 
   // ── Central navigation controller (Glass-primary) ──
   // All screen transitions are driven from here based on state changes.
