@@ -90,11 +90,12 @@ export function PomodoroGlasses() {
   // Map URL patterns to glass screens
   const deriveScreen = createScreenMapper(
     [
-      { pattern: '/', screen: 'start-config' },
+      { pattern: '/', screen: 'home' },
+      { pattern: '/config', screen: 'start-config' },
       { pattern: /^\/session\/[^/]+$/, screen: 'session' },
       { pattern: /^\/session\/[^/]+\/complete$/, screen: 'complete' },
     ],
-    'start-config'
+    'home'
   );
 
   // Create immutable snapshot of current state for glass
@@ -147,6 +148,7 @@ export function PomodoroGlasses() {
       onGAAction(action, nav, snap, ctxRef.current),
     deriveScreen: (path: string) => deriveScreen(path),
     appName: 'POMODO',
+    getPageMode: (screen: string) => screen === 'home' ? 'home' : 'text',
   });
 
   return null;

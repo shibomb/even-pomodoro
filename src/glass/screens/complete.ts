@@ -31,7 +31,7 @@ export const completeScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
     const lines = [
         line(`▉▊▋▌▍▎▏ ${snapshot.config.textGreatWork}`),
         line(''),
-        line(`Cycles: ${cycles}/${target}`),
+        line(`${snapshot.config.textCycle}: ${cycles}/${target}`),
         line(`Time:   ${formatDuration(duration)}`),
         line('')
     ]
@@ -47,6 +47,7 @@ export const completeScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> = {
   action(action, nav, _snapshot: PomodoroSnapshot, ctx: PomodoroActions) {
     if (action.type === 'SELECT_HIGHLIGHTED' || action.type === 'GO_BACK') {
       // Clear session → PomodoroGlasses navigates to home
+      ctx.setFocusedField(null);
       ctx.clearSession();
     }
     return nav;

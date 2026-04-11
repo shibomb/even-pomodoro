@@ -19,6 +19,7 @@ export interface PomodoroConfig {
   textBreak: string;
   textBreaking: string;
   textGreatWork: string;
+  textCycle: string;
 }
 
 /**

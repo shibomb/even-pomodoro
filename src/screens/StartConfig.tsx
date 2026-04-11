@@ -74,7 +74,7 @@ export default function StartConfig() {
               <div className="text-text-dim text-[10px]">min</div>
             </div>
             <div>
-              <div className="text-text-dim text-[11px] mb-1">Cycles</div>
+              <div className="text-text-dim text-[11px] mb-1">{config.textCycle}</div>
               <select
                 value={config.sessionsPerCycle}
                 onChange={(e) => updateConfig({ sessionsPerCycle: Number(e.target.value) })}
@@ -160,6 +160,7 @@ export default function StartConfig() {
                     ['textBreak', 'BREAK'] as const,
                     ['textBreaking', 'BREAKING'] as const,
                     ['textGreatWork', 'GREAT WORK!'] as const,
+                    ['textCycle', 'CYCLE'] as const,
                   ]).map(([field, label]) => (
                     <div key={field} className="flex items-center gap-2">
                       <label className="text-[11px] text-text-dim w-20 shrink-0">{label}</label>

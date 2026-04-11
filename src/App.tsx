@@ -13,6 +13,7 @@ export default function App() {
         <div className="min-h-screen">
           <Routes>
             <Route path="/" element={<StartConfig />} />
+            <Route path="/config" element={<StartConfig />} />
             <Route path="/session/:id" element={<Session />} />
             <Route path="/session/:id/complete" element={<Complete />} />
           </Routes>

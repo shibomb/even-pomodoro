@@ -13,4 +13,5 @@ export const DEFAULT_CONFIG: PomodoroConfig = {
   textBreak: 'BREAK',
   textBreaking: 'BREAKING',
   textGreatWork: 'GREAT WORK!',
+  textCycle: 'CYCLE',
 };

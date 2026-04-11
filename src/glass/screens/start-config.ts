@@ -15,7 +15,7 @@ function getRows(snapshot: PomodoroSnapshot): RowDef[] {
   return [
     { type: 'field',  field: 'workDuration',  label: snapshot.config.textWork,  unit: 'min.' },
     { type: 'field',  field: 'breakDuration', label: snapshot.config.textBreak, unit: 'min.' },
-    { type: 'field',  field: 'cycles',        label: 'CYCLE', unit: 'times' },
+    { type: 'field',  field: 'cycles',        label: snapshot.config.textCycle, unit: 'times' },
     { type: 'action', field: 'start',         label: '[START]' },
   ];
 }
@@ -103,6 +103,10 @@ export const startConfigScreen: GlassScreen<PomodoroSnapshot, PomodoroActions> =
     } else if (action.type === 'GO_BACK') {
       if (fi > 0) {
         ctx.setFocusedField(rows[fi - 1].field);
+      } else {
+        // First field → go back to home screen
+        ctx.setFocusedField(null);
+        ctx.navigate('/');
       }
     }
 
