@@ -14,8 +14,7 @@
   },
   "dependencies": {
     "@evenrealities/even_hub_sdk": "^0.0.9",
-    "@evenrealities/evenhub-simulator": "^0.6.2",
-    "@jappyjan/even-better-sdk": "^0.0.11",
+    "@evenrealities/evenhub-simulator": "^0.7.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.0",
     "even-toolkit": "^1.4.0",
