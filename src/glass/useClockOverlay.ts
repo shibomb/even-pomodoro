@@ -30,17 +30,8 @@ function getClockText(): string {
  * - showHomePage is replaced to include the clock in rebuildPageContainer
  * - updateHomeText is wrapped to also update the clock via textContainerUpgrade
  */
-function patchBridge(hub: any): void {
-  if (hub.__clockPatched) return;
-
-  const origShowHomePage = hub.showHomePage.bind(hub);
-  const origUpdateHomeText = hub.updateHomeText.bind(hub);
-
-  hub.__clockOrigShowHomePage = origShowHomePage;
-  hub.__clockOrigUpdateHomeText = origUpdateHomeText;
-
-  // Replace showHomePage to include clock container in rebuild
-  hub.showHomePage = async (menuText: string, imageTiles?: any[]) => {
+function showHomePageWithClock(hub: any, menuText: string, imageTiles?: any[]): Promise<void> {
+  return (async () => {
     if (!hub.rawBridge || !hub._pageReady) return;
 
     // Render dummy page first (same as original)
@@ -78,10 +69,34 @@ function patchBridge(hub: any): void {
       })),
     }));
     hub._currentMode = 'home';
+  })();
+}
+
+function patchBridge(hub: any): void {
+  if (hub.__clockPatched) return;
+
+  const origShowHomePage = hub.showHomePage.bind(hub);
+  const origUpdateHomeText = hub.updateHomeText.bind(hub);
+
+  hub.__clockOrigShowHomePage = origShowHomePage;
+  hub.__clockOrigUpdateHomeText = origUpdateHomeText;
+
+  // Replace showHomePage to include clock container in rebuild
+  hub.showHomePage = async (menuText: string, imageTiles?: any[]) => {
+    hub.__clockNeedsRebuild = false; // clock container is being set up
+    await showHomePageWithClock(hub, menuText, imageTiles);
   };
 
-  // Wrap updateHomeText to also update clock
+  // Wrap updateHomeText to also update clock.
+  // On the FIRST call after patching (__clockNeedsRebuild), do a full rebuild
+  // instead — this guarantees the clock container exists regardless of startup
+  // timing between useClockOverlay and useGlasses.
   hub.updateHomeText = async (content: string) => {
+    if (hub.__clockNeedsRebuild) {
+      hub.__clockNeedsRebuild = false;
+      await showHomePageWithClock(hub, content);
+      return;
+    }
     await origUpdateHomeText(content);
     if (hub.rawBridge && hub._currentMode === 'home') {
       try {
@@ -96,6 +111,7 @@ function patchBridge(hub: any): void {
   };
 
   hub.__clockPatched = true;
+  hub.__clockNeedsRebuild = true;
 }
 
 function unpatchBridge(hub: any): void {
